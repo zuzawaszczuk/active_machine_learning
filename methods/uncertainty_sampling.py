@@ -1,18 +1,10 @@
 from abc import ABC, abstractmethod
-from dataset import DatasetWithoutLabels
+import torch
+from torch.utils.data import DataLoader
+import torch.nn as nn
 
 
 class UncertaintySampling(ABC):
-    def __init__(self, dataset: DatasetWithoutLabels):
-        self.dataset = dataset
-
     @abstractmethod
-    def select_samples(self, model, X_pool, n_samples):
+    def select_samples(self, model: nn.Module, X_pool: DataLoader, n_samples: int, device: torch.device) -> list[int]:
         pass
-
-    def train(self, model, X_train, y_train, batch_size=32,epochs=10):
-        
-        
-        model.fit(X_train, y_train)
-
-    
