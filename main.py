@@ -12,4 +12,8 @@ print(data.shape)
 targets = cifar.targets
 print(len(targets))
 
-dataset = DatasetWithoutLabels(data.tolist(), targets)
+transform = transforms.Compose([
+    transforms.ToTensor(),  # automatycznie: HWC → CHW + /255
+])
+
+dataset = DatasetWithoutLabels(data.tolist(), targets, transform)
