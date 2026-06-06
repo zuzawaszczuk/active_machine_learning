@@ -1,5 +1,5 @@
 from torchvision import datasets, transforms
-from dataset import DatasetWithoutLabels
+from dataset import ActiveLearningController, DatasetWithoutLabels
 
 cifar = datasets.CIFAR10(
     root="./data",
@@ -13,7 +13,9 @@ targets = cifar.targets
 print(len(targets))
 
 transform = transforms.Compose([
-    transforms.ToTensor(),  # automatycznie: HWC → CHW + /255
+    transforms.ToTensor(),
 ])
 
 dataset = DatasetWithoutLabels(data.tolist(), targets, transform)
+
+controller = ActiveLearningController(dataset)

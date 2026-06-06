@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
+from dataset import DatasetWithoutLabels
 
 
 class UncertaintySampling(ABC):
+    def __init__(self, dataset: DatasetWithoutLabels):
+        self.dataset = dataset
+
     @abstractmethod
     def select_samples(self, model, X_pool, n_samples):
         pass
