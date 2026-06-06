@@ -6,5 +6,7 @@ import torch.nn as nn
 
 class UncertaintySampling(ABC):
     @abstractmethod
-    def select_samples(self, model: nn.Module, X_pool: DataLoader, n_samples: int, device: torch.device) -> list[int]:
+    def select_samples(
+        self, model: nn.Module, X_pool: DataLoader, n_samples: int, device: torch.device
+    ) -> list[int]:
         pass

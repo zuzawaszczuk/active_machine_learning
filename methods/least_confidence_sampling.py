@@ -3,12 +3,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch
 
+
 class LeastConfidenceSampling(UncertaintySampling):
-    def select_samples(self, model: nn.Module, X_pool: DataLoader, n_samples: int, device: torch.device) -> list[int]:
+    def select_samples(
+        self, model: nn.Module, X_pool: DataLoader, n_samples: int, device: torch.device
+    ) -> list[int]:
         model.eval()
 
         scores = []
-        indices = []
 
         with torch.no_grad():
             for x, _ in X_pool:
@@ -22,4 +24,4 @@ class LeastConfidenceSampling(UncertaintySampling):
                 scores.extend(uncertainty.cpu().tolist())
 
         _, indices = torch.topk(torch.tensor(scores), n_samples)
-        return indices.tolist()
+        return list(indices)

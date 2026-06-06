@@ -1,10 +1,11 @@
 import torch
 from torch.utils.data import Dataset
 from typing import Callable
+from typing import Any
 
 
 class PoolDataset(Dataset):
-    def __init__(self, data: list[any], targets: list[int], transform: Callable):
+    def __init__(self, data: list[Any], targets: list[int], transform: Callable):
         self.data = data
         self.targets = targets
         self.transform = transform

@@ -10,3 +10,6 @@ dependencies = [
     "ruff>=0.15.16",
     "torchvision>=0.27.0",
 ]
+
+[mypy]
+ignore_missing_imports = true

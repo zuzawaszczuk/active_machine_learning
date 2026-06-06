@@ -5,12 +5,12 @@ from dataset import PoolDataset
 class ActiveLearningController:
     def __init__(self, dataset: PoolDataset):
         self.dataset = dataset
-        self.labeled_idx = set()
-        self.unlabeled_idx = set(range(len(dataset)))
+        self.labeled_idx: set[int] = set()
+        self.unlabeled_idx: set[int] = set(range(len(dataset)))
 
     def label_samples(self, new_indices: list[int]):
-        new_indices = set(new_indices)
-        for idx in new_indices:
+        set_indices = set(new_indices)
+        for idx in set_indices:
             self.labeled_idx.add(idx)
             self.unlabeled_idx.remove(idx)
 
