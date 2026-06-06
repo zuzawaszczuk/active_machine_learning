@@ -13,21 +13,31 @@ from torchvision.models import ResNet18_Weights
 
 def get_dataset() -> PoolDataset:
     cifar = datasets.CIFAR10(root="./data", train=True, download=True)
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+        ]
+    )
     return PoolDataset(cifar.data, cifar.targets, transform)
 
 
 def get_model() -> nn.Module:
     model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
-    model.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=1, bias=False)
+    model.conv1 = nn.Conv2d(
+        in_channels=3, out_channels=64, kernel_size=3, stride=1, padding=1, bias=False
+    )
     model.maxpool = nn.Identity()
     model.fc = nn.Linear(model.fc.in_features, 10)
     return model
 
 
-def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: optim.Optimizer, criterion: nn.Module, device: torch.device):
+def train_one_epoch(
+    model: nn.Module,
+    loader: DataLoader,
+    optimizer: optim.Optimizer,
+    criterion: nn.Module,
+    device: torch.device,
+):
     model.train()
 
     for x, y in loader:
@@ -41,7 +51,14 @@ def train_one_epoch(model: nn.Module, loader: DataLoader, optimizer: optim.Optim
         optimizer.step()
 
 
-def train_active_learning(model: nn.Module, controller: ActiveLearningController, strategy: UncertaintySampling, epochs: int, batch_size: int, device: torch.device):
+def train_active_learning(
+    model: nn.Module,
+    controller: ActiveLearningController,
+    strategy: UncertaintySampling,
+    epochs: int,
+    batch_size: int,
+    device: torch.device,
+):
     controller.reset()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
@@ -77,17 +94,19 @@ def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> floa
             total += y.size(0)
 
     return correct / total
-        
+
 
 def main():
     dataset = get_dataset()
-    model = get_model() 
+    model = get_model()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
-    
+
     controller = ActiveLearningController(dataset)
     strategy = LeastConfidenceSampling()
-    train_active_learning(model, controller, strategy, epochs=10, batch_size=32, device=device)
+    train_active_learning(
+        model, controller, strategy, epochs=10, batch_size=32, device=device
+    )
 
 
 if __name__ == "__main__":
