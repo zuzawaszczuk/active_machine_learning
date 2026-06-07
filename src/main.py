@@ -1,14 +1,15 @@
 import pandas as pd
-from src.controller import ActiveLearningController
-from src.dataset import IndexedSubset
-from src.methods import UncertaintySampling
-from src.methods import LeastConfidenceSampling, MarginSampling, RatioOfConfidenceSampling, EntropySampling
+from controller import ActiveLearningController
+from dataset import IndexedSubset
+from methods import UncertaintySampling
+from methods import LeastConfidenceSampling, MarginSampling, RatioOfConfidenceSampling, EntropySampling, RandomSampling
 import torch.nn as nn
 import torch.optim as optim
 import torch
-from src.training_helpers import get_dataset, get_model, evaluate, train_one_epoch
+from training_helpers import get_dataset, get_model, evaluate, train_one_epoch
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 
@@ -50,6 +51,7 @@ dict_methods = {
     "margin": MarginSampling(),
     "ratio_of_confidence": RatioOfConfidenceSampling(),
     "entropy": EntropySampling(),
+    "random": RandomSampling(),
 }
 
 
@@ -57,12 +59,12 @@ def plot_wide(df: pd.DataFrame) -> None:
     plt.figure(figsize=(10, 6))
 
     for col in df.columns:
-        if col == "iteration":
+        if col == "amount_of_labeled_dataset":
             continue
 
-        plt.plot(df["iteration"], df[col], marker="o", label=col)
+        plt.plot(df["amount_of_labeled_dataset"], df[col], marker="o", label=col)
 
-    plt.xlabel("Iteration")
+    plt.xlabel("Amount of Labeled Data")
     plt.ylabel("Validation accuracy")
     plt.title("Active Learning comparison")
     plt.legend()
@@ -72,17 +74,20 @@ def plot_wide(df: pd.DataFrame) -> None:
     plt.close()
 
 def main():
+    EPOCHS = 20
+    BATCH_SIZE = 32
+
     train_dataset, val_dataset, test_dataset = get_dataset()
-    val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=32, shuffle=False)
+    val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=BATCH_SIZE, shuffle=False)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     df = pd.DataFrame()
-    df["iteration"] = range(20)
+    df["amount_of_labeled_dataset"] = np.arange(1, EPOCHS+1) * BATCH_SIZE
 
     controller = ActiveLearningController(train_dataset)
     strategy = LeastConfidenceSampling()
     for name, strategy in dict_methods.items():
         print(f"Training with strategy: {name}")
-        val_accs = train_active_learning(controller, strategy, 20, 32, val_loader, device=device)
+        val_accs = train_active_learning(controller, strategy, EPOCHS, BATCH_SIZE, val_loader, device=device)
         df[name] = val_accs
 
     plot_wide(df)
