@@ -1,5 +1,5 @@
 from torch.utils.data import DataLoader, Subset, Dataset
-from dataset import IndexedSubset
+from src.dataset import IndexedSubset
 
 class ActiveLearningController:
     def __init__(self, dataset: IndexedSubset):
