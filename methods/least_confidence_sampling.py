@@ -11,10 +11,12 @@ class LeastConfidenceSampling(UncertaintySampling):
         model.eval()
 
         scores = []
+        pool_indices = []
 
         with torch.no_grad():
-            for x, _ in X_pool:
+            for x, y, idx in X_pool:
                 x = x.to(device)
+
                 logits = model(x)
                 probs = torch.softmax(logits, dim=1)
 
@@ -22,6 +24,9 @@ class LeastConfidenceSampling(UncertaintySampling):
                 uncertainty = 1 - confidence
 
                 scores.extend(uncertainty.cpu().tolist())
+                pool_indices.extend(idx.tolist())
 
-        _, indices = torch.topk(torch.tensor(scores), n_samples)
-        return list(indices)
+        _, topk_idx = torch.topk(torch.tensor(scores), n_samples)
+        selected = [pool_indices[i] for i in topk_idx.tolist()]
+
+        return selected

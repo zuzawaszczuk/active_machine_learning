@@ -1,19 +1,16 @@
-import torch
 from torch.utils.data import Dataset
-from typing import Callable
-from typing import Any
+import torch
 
 
-class PoolDataset(Dataset):
-    def __init__(self, data: list[Any], targets: list[int], transform: Callable):
-        self.data = data
-        self.targets = targets
-        self.transform = transform
+class IndexedSubset(Dataset):
+    def __init__(self, dataset: Dataset, indices: list[int]):
+        self.dataset = dataset
+        self.indices = list(indices)
 
     def __len__(self) -> int:
-        return len(self.data)
+        return len(self.indices)
 
-    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
-        x = self.transform(self.data[idx])
-        y = torch.tensor(self.targets[idx], dtype=torch.long)
-        return x, y
+    def __getitem__(self, i: int) -> tuple[torch.Tensor, int, int]:
+        real_idx = self.indices[i]
+        x, y = self.dataset[real_idx]
+        return x, y, real_idx

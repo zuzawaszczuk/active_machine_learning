@@ -1,9 +1,8 @@
-from torch.utils.data import DataLoader, Subset
-from dataset import PoolDataset
-
+from torch.utils.data import DataLoader, Subset, Dataset
+from dataset import IndexedSubset
 
 class ActiveLearningController:
-    def __init__(self, dataset: PoolDataset):
+    def __init__(self, dataset: IndexedSubset):
         self.dataset = dataset
         self.labeled_idx: set[int] = set()
         self.unlabeled_idx: set[int] = set(range(len(dataset)))
@@ -16,12 +15,12 @@ class ActiveLearningController:
 
     def get_labeled_loader(self, batch_size=32) -> DataLoader:
         return DataLoader(
-            Subset(self.dataset, list(self.labeled_idx)), batch_size, shuffle=True
+            IndexedSubset(self.dataset, list(self.labeled_idx)), batch_size, shuffle=True
         )
 
     def get_unlabeled_loader(self, batch_size=32) -> DataLoader:
         return DataLoader(
-            Subset(self.dataset, list(self.unlabeled_idx)), batch_size, shuffle=False
+            IndexedSubset(self.dataset, list(self.unlabeled_idx)), batch_size, shuffle=False
         )
 
     def reset(self):
