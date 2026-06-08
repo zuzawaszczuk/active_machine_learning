@@ -9,8 +9,8 @@ from torchvision.models import ResNet18_Weights
 
 
 def get_dataset() -> tuple[Dataset, Dataset, Dataset]:
-    train_cifar = datasets.CIFAR10(root="./data", train=True, download=True, transform=transforms.ToTensor())
-    test_cifar = datasets.CIFAR10(root="./data", train=False, download=True, transform=transforms.ToTensor())
+    train_cifar = datasets.CIFAR100TL(root="./data", train=True, download=True, transform=transforms.ToTensor())
+    test_cifar = datasets.CIFAR100TL(root="./data", train=False, download=True, transform=transforms.ToTensor())
 
     train_idx, val_idx = train_test_split(
         range(len(train_cifar)),
@@ -24,7 +24,7 @@ def get_dataset() -> tuple[Dataset, Dataset, Dataset]:
 
 
 class SimpleCNN(nn.Module):
-    def __init__(self, num_classes: int = 10):
+    def __init__(self, num_classes: int = 100):
         super().__init__()
 
         self.features = nn.Sequential(
@@ -55,7 +55,7 @@ def get_model() -> nn.Module:
     # )
     # model.maxpool = nn.Identity()
     # model.fc = nn.Linear(model.fc.in_features, 10)
-    return SimpleCNN(num_classes=10)
+    return SimpleCNN(num_classes=100)
 
 
 def train_one_epoch(

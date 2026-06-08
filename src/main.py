@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
 def train_active_learning(
     controller: ActiveLearningController,
     strategy: UncertaintySampling,
@@ -74,8 +73,8 @@ def plot_wide(df: pd.DataFrame) -> None:
     plt.close()
 
 def main():
-    EPOCHS = 20
-    BATCH_SIZE = 32
+    EPOCHS = 200
+    BATCH_SIZE = 4
 
     train_dataset, val_dataset, test_dataset = get_dataset()
     val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=BATCH_SIZE, shuffle=False)
