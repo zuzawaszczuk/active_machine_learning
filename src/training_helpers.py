@@ -1,26 +1,56 @@
-from torchvision import datasets, transforms
+from collections import defaultdict
+import numpy as np
+from torch.utils.data import random_split
 import torchvision.models as models
 import torch.nn as nn
 import torch.optim as optim
 import torch
-from torch.utils.data import DataLoader, Subset, Dataset
+from torch.utils.data import DataLoader, Subset, Dataset, TensorDataset
 from sklearn.model_selection import train_test_split
 from torchvision.models import ResNet18_Weights
+from torchvision import datasets, transforms
+
+
+def imbalance_train_dataset(train_cifar, seed=42):
+    rng = np.random.default_rng(seed)
+    targets = np.array(train_cifar.targets)
+
+    print("Original length of training dataset:", len(train_cifar))
+    
+    unique_classes = np.unique(targets)
+    minority_classes = set(range(20))
+    selected_indices = []
+
+    for cls in unique_classes:
+        idxs = np.flatnonzero(targets == cls)
+        
+        if len(idxs) == 0:
+            continue
+            
+        if cls not in minority_classes:
+        #     sampled = rng.choice(idxs, size=len(idxs) * 10, replace=True)
+        # else:
+            sampled = rng.choice(idxs, size=max(1, len(idxs) // 10), replace=False)
+            
+        selected_indices.append(sampled)
+
+    selected_indices = np.concatenate(selected_indices)
+    rng.shuffle(selected_indices)
+
+    print("Length of training dataset after imbalance sampling:", len(selected_indices))
+    
+    return Subset(train_cifar, selected_indices)
 
 
 def get_dataset() -> tuple[Dataset, Dataset, Dataset]:
-    train_cifar = datasets.CIFAR100TL(root="./data", train=True, download=True, transform=transforms.ToTensor())
-    test_cifar = datasets.CIFAR100TL(root="./data", train=False, download=True, transform=transforms.ToTensor())
+    train_cifar = datasets.CIFAR100(root="./data", train=True, download=True, transform=transforms.ToTensor())
+    test_cifar = datasets.CIFAR100(root="./data", train=False, download=True, transform=transforms.ToTensor())
 
-    train_idx, val_idx = train_test_split(
-        range(len(train_cifar)),
-        test_size=5000,
-        random_state=42,
-    )
-    train_dataset = Subset(train_cifar, train_idx)
-    val_dataset = Subset(train_cifar, val_idx)
+    val_size = 5000
+    test_size = len(test_cifar) - val_size
 
-    return train_dataset, val_dataset, test_cifar
+    val_cifar, test_cifar = random_split(test_cifar, [val_size, test_size])
+    return imbalance_train_dataset(train_cifar), val_cifar, test_cifar
 
 
 class SimpleCNN(nn.Module):
@@ -48,6 +78,7 @@ class SimpleCNN(nn.Module):
         x = x.flatten(1)
         return self.classifier(x)
 
+
 def get_model() -> nn.Module:
     # model = models.resnet18(weights=ResNet18_Weights.DEFAULT)
     # model.conv1 = nn.Conv2d(
@@ -55,6 +86,7 @@ def get_model() -> nn.Module:
     # )
     # model.maxpool = nn.Identity()
     # model.fc = nn.Linear(model.fc.in_features, 10)
+    # return SimpleCNN(num_classes=100)
     return SimpleCNN(num_classes=100)
 
 

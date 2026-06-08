@@ -54,7 +54,7 @@ dict_methods = {
 }
 
 
-def plot_wide(df: pd.DataFrame) -> None:
+def plot_wide(df: pd.DataFrame, name: str) -> None:
     plt.figure(figsize=(10, 6))
 
     for col in df.columns:
@@ -69,12 +69,12 @@ def plot_wide(df: pd.DataFrame) -> None:
     plt.legend()
     plt.grid(True)
 
-    plt.savefig("comparison.png")
+    plt.savefig(name)
     plt.close()
 
 def main():
-    EPOCHS = 200
-    BATCH_SIZE = 4
+    EPOCHS = 100
+    BATCH_SIZE = 64
 
     train_dataset, val_dataset, test_dataset = get_dataset()
     val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=BATCH_SIZE, shuffle=False)
@@ -89,7 +89,7 @@ def main():
         val_accs = train_active_learning(controller, strategy, EPOCHS, BATCH_SIZE, val_loader, device=device)
         df[name] = val_accs
 
-    plot_wide(df)
+    plot_wide(df, name=f"comparison_epochs_{EPOCHS}_batch_size_{BATCH_SIZE}.png")
     df.to_csv("results.csv", index=False)
 
 if __name__ == "__main__":
