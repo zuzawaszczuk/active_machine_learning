@@ -1,3 +1,5 @@
+from random import random
+
 import pandas as pd
 from controller import ActiveLearningController
 from dataset import IndexedSubset
@@ -72,9 +74,16 @@ def plot_wide(df: pd.DataFrame, name: str) -> None:
     plt.savefig(name)
     plt.close()
 
+def set_seed(run: int) -> None:
+    torch.manual_seed(run)
+    np.random.seed(run)
+    random.seed(run)
+    
+
 def main():
     EPOCHS = 100
-    BATCH_SIZE = 64
+    BATCH_SIZE = 128
+    N_RUNS = 1
 
     train_dataset, val_dataset, test_dataset = get_dataset()
     val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=BATCH_SIZE, shuffle=False)
@@ -83,13 +92,17 @@ def main():
     df["amount_of_labeled_dataset"] = np.arange(1, EPOCHS+1) * BATCH_SIZE
 
     controller = ActiveLearningController(train_dataset)
-    strategy = LeastConfidenceSampling()
     for name, strategy in dict_methods.items():
         print(f"Training with strategy: {name}")
-        val_accs = train_active_learning(controller, strategy, EPOCHS, BATCH_SIZE, val_loader, device=device)
-        df[name] = val_accs
 
-    plot_wide(df, name=f"comparison_epochs_{EPOCHS}_batch_size_{BATCH_SIZE}.png")
+        all_runs = []
+        for run in range(N_RUNS):
+            print(f"Run {run+1}/{N_RUNS}")
+            val_accs = train_active_learning(controller, strategy, EPOCHS, BATCH_SIZE, val_loader, device=device)
+            all_runs.append(val_accs)
+        df[name] = np.mean(all_runs, axis=0)
+
+    plot_wide(df, name=f"comparison_epochs_{EPOCHS}_batch_size_{BATCH_SIZE}_runs_{N_RUNS}.png")
     df.to_csv("results.csv", index=False)
 
 if __name__ == "__main__":

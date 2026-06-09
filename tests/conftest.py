@@ -24,7 +24,7 @@ class FakeDataset(Dataset):
 
     def __getitem__(self, idx):
         x = torch.randn(3, 32, 32)
-        y = idx % 10  # pseudo-label
+        y = idx % 10
         return x, y, idx
 
 
@@ -40,5 +40,4 @@ def model():
 
 @pytest.fixture
 def controller(dataset):
-    
     return ActiveLearningController(dataset)

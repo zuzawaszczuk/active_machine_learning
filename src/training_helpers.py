@@ -27,9 +27,9 @@ def imbalance_train_dataset(train_cifar, seed=42):
         if len(idxs) == 0:
             continue
             
-        if cls not in minority_classes:
-        #     sampled = rng.choice(idxs, size=len(idxs) * 10, replace=True)
-        # else:
+        if cls in minority_classes:
+            sampled = idxs
+        else:
             sampled = rng.choice(idxs, size=max(1, len(idxs) // 10), replace=False)
             
         selected_indices.append(sampled)
