@@ -30,7 +30,7 @@ def imbalance_train_dataset(train_cifar, seed=42, num_classes=10):
         if cls in static_classes:
             sampled = idxs
         else:
-            sampled = rng.choice(idxs, size=max(1, len(idxs) // 10), replace=False)
+            sampled = rng.choice(idxs, size=max(1, len(idxs) // 50), replace=False)
             
         selected_indices.append(sampled)
 

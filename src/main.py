@@ -82,8 +82,8 @@ def set_seed(run: int) -> None:
 
 def main():
     EPOCHS = 100
-    BATCH_SIZE = 128
-    N_RUNS = 1
+    BATCH_SIZE = 16
+    N_RUNS = 10
 
     train_dataset, val_dataset, test_dataset = get_dataset()
     val_loader = DataLoader(IndexedSubset(val_dataset, list(range(len(val_dataset)))), batch_size=BATCH_SIZE, shuffle=False)
