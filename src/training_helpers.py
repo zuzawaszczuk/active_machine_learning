@@ -11,14 +11,14 @@ from torchvision.models import ResNet18_Weights
 from torchvision import datasets, transforms
 
 
-def imbalance_train_dataset(train_cifar, seed=42):
+def imbalance_train_dataset(train_cifar, seed=42, num_classes=10):
     rng = np.random.default_rng(seed)
     targets = np.array(train_cifar.targets)
 
     print("Original length of training dataset:", len(train_cifar))
     
     unique_classes = np.unique(targets)
-    minority_classes = set(range(20))
+    static_classes = set(range(int(0.2 * num_classes)))
     selected_indices = []
 
     for cls in unique_classes:
@@ -27,7 +27,7 @@ def imbalance_train_dataset(train_cifar, seed=42):
         if len(idxs) == 0:
             continue
             
-        if cls in minority_classes:
+        if cls in static_classes:
             sampled = idxs
         else:
             sampled = rng.choice(idxs, size=max(1, len(idxs) // 10), replace=False)
@@ -43,18 +43,18 @@ def imbalance_train_dataset(train_cifar, seed=42):
 
 
 def get_dataset() -> tuple[Dataset, Dataset, Dataset]:
-    train_cifar = datasets.CIFAR100(root="./data", train=True, download=True, transform=transforms.ToTensor())
-    test_cifar = datasets.CIFAR100(root="./data", train=False, download=True, transform=transforms.ToTensor())
+    train_cifar = datasets.CIFAR10(root="./data", train=True, download=True, transform=transforms.ToTensor())
+    test_cifar = datasets.CIFAR10(root="./data", train=False, download=True, transform=transforms.ToTensor())
 
     val_size = 5000
     test_size = len(test_cifar) - val_size
 
     val_cifar, test_cifar = random_split(test_cifar, [val_size, test_size])
-    return imbalance_train_dataset(train_cifar), val_cifar, test_cifar
+    return imbalance_train_dataset(train_cifar, num_classes=10), val_cifar, test_cifar
 
 
 class SimpleCNN(nn.Module):
-    def __init__(self, num_classes: int = 100):
+    def __init__(self, num_classes: int = 10):
         super().__init__()
 
         self.features = nn.Sequential(
@@ -87,7 +87,7 @@ def get_model() -> nn.Module:
     # model.maxpool = nn.Identity()
     # model.fc = nn.Linear(model.fc.in_features, 10)
     # return SimpleCNN(num_classes=100)
-    return SimpleCNN(num_classes=100)
+    return SimpleCNN(num_classes=10)
 
 
 def train_one_epoch(

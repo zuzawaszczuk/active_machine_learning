@@ -102,8 +102,9 @@ def main():
             all_runs.append(val_accs)
         df[name] = np.mean(all_runs, axis=0)
 
-    plot_wide(df, name=f"comparison_epochs_{EPOCHS}_batch_size_{BATCH_SIZE}_runs_{N_RUNS}.png")
-    df.to_csv("results.csv", index=False)
+    name = f"comparison_cifar10_epochs_{EPOCHS}_batch_size_{BATCH_SIZE}_runs_{N_RUNS}.png"
+    plot_wide(df, name=f"{name}.png")
+    df.to_csv(f"results_{name}.csv", index=False)
 
 if __name__ == "__main__":
     main()
