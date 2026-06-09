@@ -1,5 +1,19 @@
-from torch.utils.data import DataLoader, Subset, Dataset
-from dataset import IndexedSubset
+from torch.utils.data import DataLoader, Dataset
+import torch
+
+
+class IndexedSubset(Dataset):
+    def __init__(self, dataset: Dataset, indices: list[int]):
+        self.dataset = dataset
+        self.indices = list(indices)
+
+    def __len__(self) -> int:
+        return len(self.indices)
+
+    def __getitem__(self, i: int) -> tuple[torch.Tensor, int, int]:
+        real_idx = self.indices[i]
+        x, y = self.dataset[real_idx]
+        return x, y, real_idx
 
 
 class ActiveLearningController:
@@ -16,12 +30,16 @@ class ActiveLearningController:
 
     def get_labeled_loader(self, batch_size=32) -> DataLoader:
         return DataLoader(
-            IndexedSubset(self.dataset, list(self.labeled_idx)), batch_size, shuffle=True
+            IndexedSubset(self.dataset, list(self.labeled_idx)),
+            batch_size,
+            shuffle=True,
         )
 
     def get_unlabeled_loader(self, batch_size=32) -> DataLoader:
         return DataLoader(
-            IndexedSubset(self.dataset, list(self.unlabeled_idx)), batch_size, shuffle=False
+            IndexedSubset(self.dataset, list(self.unlabeled_idx)),
+            batch_size,
+            shuffle=False,
         )
 
     def reset(self):

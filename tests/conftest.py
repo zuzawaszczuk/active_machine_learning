@@ -13,7 +13,7 @@ class FakeModel(nn.Module):
     def forward(self, x):
         x = x.view(x.size(0), -1)
         return self.linear(x)
-    
+
 
 class FakeDataset(Dataset):
     def __init__(self, size=100):

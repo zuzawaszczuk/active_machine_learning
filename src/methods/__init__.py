@@ -5,4 +5,11 @@ from .ratio_of_confidence import RatioOfConfidenceSampling
 from .entropy_sampling import EntropySampling
 from .random_sampling import RandomSampling
 
-__all__ = ["UncertaintySampling", "LeastConfidenceSampling", "MarginSampling", "RatioOfConfidenceSampling", "EntropySampling", "RandomSampling"]
+__all__ = [
+    "UncertaintySampling",
+    "LeastConfidenceSampling",
+    "MarginSampling",
+    "RatioOfConfidenceSampling",
+    "EntropySampling",
+    "RandomSampling",
+]

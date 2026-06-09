@@ -1,5 +1,5 @@
 import kagglehub
 
 # Download latest version
-path = kagglehub.dataset_download("miadul/credit-card-fraud-detection-dataset")
-print(path)
+path = kagglehub.dataset_download("apollo2506/eurosat-dataset")
+print("Dataset downloaded to:", path)
