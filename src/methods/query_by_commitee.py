@@ -1,4 +1,5 @@
 import numpy as np
+
 from sklearn.ensemble import RandomForestClassifier
 
 
@@ -35,15 +36,15 @@ class QueryByCommittee:
         if self.score == "vote_entropy":
             scores = self._vote_entropy(rf, X_unlabeled)
 
+        elif self.score == "max_disagreement":
+            scores = self._maximum_disagreement(rf, X_unlabeled)
+
         elif self.score == "kl_divergence":
             scores = self._kl_divergence(rf, X_unlabeled)
 
-        elif self.score == "variation_ratio":
-            scores = self._variation_ratio(rf, X_unlabeled)
-
         else:
             raise ValueError(
-                "score must be one of: vote_entropy, kl_divergence, variation_ratio"
+                "score must be one of: vote_entropy, max_disagreement, kl_divergence"
             )
 
         selected_positions = np.argsort(scores)[-n_samples:]
@@ -51,39 +52,39 @@ class QueryByCommittee:
 
         return selected_indices
 
-    def _vote_entropy(self, rf, X_unlabeled):
+    def _get_tree_predictions(self, rf, X_unlabeled):
         tree_predictions = np.array([
             tree.predict(X_unlabeled)
             for tree in rf.estimators_
         ])
 
-        tree_predictions = tree_predictions.T
+        return tree_predictions.T
+
+    def _vote_entropy(self, rf, X_unlabeled):
+        tree_predictions = self._get_tree_predictions(rf, X_unlabeled)
 
         scores = []
 
         for votes in tree_predictions:
-            labels, counts = np.unique(votes, return_counts=True)
+            _, counts = np.unique(votes, return_counts=True)
             probs = counts / counts.sum()
             entropy = -np.sum(probs * np.log(probs + 1e-12))
             scores.append(entropy)
 
         return np.array(scores)
 
-    def _variation_ratio(self, rf, X_unlabeled):
-        tree_predictions = np.array([
-            tree.predict(X_unlabeled)
-            for tree in rf.estimators_
-        ])
-
-        tree_predictions = tree_predictions.T
+    def _maximum_disagreement(self, rf, X_unlabeled):
+        tree_predictions = self._get_tree_predictions(rf, X_unlabeled)
 
         scores = []
 
         for votes in tree_predictions:
-            labels, counts = np.unique(votes, return_counts=True)
-            max_vote_fraction = counts.max() / counts.sum()
-            variation_ratio = 1 - max_vote_fraction
-            scores.append(variation_ratio)
+            _, counts = np.unique(votes, return_counts=True)
+
+            max_votes = counts.max()
+            disagreement = 1 - max_votes / counts.sum()
+
+            scores.append(disagreement)
 
         return np.array(scores)
 
