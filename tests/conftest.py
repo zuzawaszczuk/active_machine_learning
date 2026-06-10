@@ -18,6 +18,7 @@ class FakeModel(nn.Module):
 class FakeDataset(Dataset):
     def __init__(self, size=100):
         self.size = size
+        self.targets = [idx % 10 for idx in range(size)]
 
     def __len__(self):
         return self.size
@@ -25,7 +26,7 @@ class FakeDataset(Dataset):
     def __getitem__(self, idx):
         x = torch.randn(3, 32, 32)
         y = idx % 10
-        return x, y, idx
+        return x, y
 
 
 @pytest.fixture

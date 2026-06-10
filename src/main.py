@@ -44,11 +44,8 @@ def train_active_learning(
         train_loader = controller.get_labeled_loader(batch_size)
         train_one_epoch(model, train_loader, optimizer, criterion, device)
 
-        train_acc = evaluate(model, train_loader, device)
-        print(f"[Epoch {epoch}] train accuracy: {train_acc:.4f}")
         val_acc = evaluate(model, val_loader, device)
         val_accs.append(val_acc)
-        print(f"[Epoch {epoch}] validation accuracy: {val_acc:.4f}")
     return val_accs
 
 
@@ -85,7 +82,6 @@ def main():
         all_runs = []
         for run in range(args.n_runs):
             set_seed(run)
-            print(f"Run {run+1}/{args.n_runs}")
             val_accs = train_active_learning(
                 controller,
                 strategy,
@@ -97,7 +93,7 @@ def main():
             all_runs.append(val_accs)
         df[name] = np.mean(all_runs, axis=0)
 
-    name = f"comparison_{args.dataset}_epochs_{args.epochs}_batch_size_{args.batch_size}_runs_{args.n_runs}_compresion_{args.compresion}.png"
+    name = f"comparison_{args.dataset}_epochs_{args.epochs}_batch_size_{args.batch_size}_runs_{args.n_runs}_compresion_{args.compresion}"
     plot_wide(df, name=f"{name}.png")
     df.to_csv(f"results_{name}.csv", index=False)
 

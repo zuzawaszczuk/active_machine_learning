@@ -1,5 +1,21 @@
 # active_machine_learning
 
+### Uruchomienie testów
+
+```
+python -m pytest tests/
+```
+### Uruchomienie eksperymentu 
+
+- `--epochs 100` — liczba iteracji treningu modelu  
+- `--n_runs 1` — liczba powtórzeń eksperymentu  
+- `--batch_size 32` — rozmiar batcha ile próbek dobierano w iteracji 
+- `--dataset cifar` — wybór zbioru danych (CIFAR)  
+- `--compression 20` — stopień redukcji zbioru treningowego  80% klas by utworzyć niezbalansowanie
+```
+python3 src/main.py --epochs 100 --n_runs 1 --batch_size 32 --dataset cifar --compresion 20
+```
+
 ### Opis Projektu
 
 Tematem projektu jest analiza zastosowania metod uczenia aktywnego w wybranym problemie uczenia maszynowego.
