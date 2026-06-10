@@ -11,8 +11,9 @@ python -m pytest tests/
 - `--n_runs 1` — liczba powtórzeń eksperymentu  
 - `--batch_size 32` — rozmiar batcha ile próbek dobierano w iteracji 
 - `--dataset cifar` — wybór zbioru danych (CIFAR)  
-- `--compression 20` — stopień redukcji zbioru treningowego  80% klas by utworzyć niezbalansowanie
+- `--compression 20` — stopień redukcji zbioru treningowego 80% klas by utworzyć niezbalansowanie
 ```
+uv sync
 python3 src/main.py --epochs 100 --n_runs 1 --batch_size 32 --dataset cifar --compresion 20
 ```
 
