@@ -1,4 +1,3 @@
-import pytest
 from src.dataset import imbalance_train_dataset
 
 
@@ -71,8 +70,8 @@ def test_get_unlabeled_loader_returns_correct_data(controller, dataset):
 def test_imbalance_train_dataset_creates_imbalanced_dataset_correctly(dataset):
     original_size = len(dataset)
     compression = 2
-    
+
     imbalanced_dataset = imbalance_train_dataset(dataset, compression, num_classes=5)
-    
+
     assert len(imbalanced_dataset) < original_size
     assert len(imbalanced_dataset) > 0

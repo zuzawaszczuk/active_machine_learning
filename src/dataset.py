@@ -23,7 +23,9 @@ def imbalance_train_dataset(train_cifar, compresion, num_classes=10, seed=42):
         if cls in static_classes:
             sampled = idxs
         else:
-            sampled = rng.choice(idxs, size=max(1, len(idxs) // compresion), replace=False)
+            sampled = rng.choice(
+                idxs, size=max(1, len(idxs) // compresion), replace=False
+            )
 
         selected_indices.append(sampled)
 
@@ -48,7 +50,11 @@ def get_cifar_dataset(compresion) -> tuple[Dataset, Dataset, Dataset]:
 
     val_cifar, test_cifar = random_split(test_cifar, [val_size, test_size])
 
-    return imbalance_train_dataset(train_cifar, compresion, num_classes=10), val_cifar, test_cifar
+    return (
+        imbalance_train_dataset(train_cifar, compresion, num_classes=10),
+        val_cifar,
+        test_cifar,
+    )
 
 
 class EuroSATDataset(Dataset):

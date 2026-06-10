@@ -52,10 +52,9 @@ class QueryByCommittee:
         return selected_indices
 
     def _vote_entropy(self, rf, X_unlabeled):
-        tree_predictions = np.array([
-            tree.predict(X_unlabeled)
-            for tree in rf.estimators_
-        ])
+        tree_predictions = np.array(
+            [tree.predict(X_unlabeled) for tree in rf.estimators_]
+        )
 
         tree_predictions = tree_predictions.T
 
@@ -70,10 +69,9 @@ class QueryByCommittee:
         return np.array(scores)
 
     def _variation_ratio(self, rf, X_unlabeled):
-        tree_predictions = np.array([
-            tree.predict(X_unlabeled)
-            for tree in rf.estimators_
-        ])
+        tree_predictions = np.array(
+            [tree.predict(X_unlabeled) for tree in rf.estimators_]
+        )
 
         tree_predictions = tree_predictions.T
 
@@ -99,8 +97,7 @@ class QueryByCommittee:
         mean_proba = np.mean(all_probas, axis=0)
 
         kl = all_probas * (
-            np.log(all_probas + 1e-12)
-            - np.log(mean_proba[None, :, :] + 1e-12)
+            np.log(all_probas + 1e-12) - np.log(mean_proba[None, :, :] + 1e-12)
         )
 
         scores = kl.sum(axis=2).mean(axis=0)
